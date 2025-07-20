@@ -1,8 +1,10 @@
-const { getLivros, getLivro, postLivro, patchLivro, delLivro} = require("../controladores/livro")
+const { getLivros, getLivro, postLivro, patchLivro, delLivro, getLivrosPorAutor} = require("../controladores/livro")
 const { Router } = require("express")
 const router = Router()
 
 router.get("/", getLivros)
+
+router.get("/busca", getLivrosPorAutor)
 
 router.get("/:id", getLivro) //consulta livros por id
 

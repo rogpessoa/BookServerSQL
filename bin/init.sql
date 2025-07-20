@@ -8,4 +8,17 @@ CREATE TABLE IF NOT EXISTS favoritos (
 ) Engine=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
+CREATE TABLE autor (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    nacionalidade VARCHAR(100)
+);
 
+CREATE
+TABLE livros (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nome VARCHAR(255),
+  ano INT,
+  autorId INT,
+    FOREIGN KEY (autorId) REFERENCES autor(id)
+);

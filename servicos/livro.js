@@ -1,4 +1,5 @@
-const db = require("../bd")
+const db = require("../bd");
+const { getAutorPorId } = require("./autores");
 
 async function getTodosLivros(){
    const [rows] = await db.query("SELECT * FROM livros")
@@ -6,16 +7,44 @@ async function getTodosLivros(){
 }
 
 
+async function listarLivrosPorAutor(autor) {
+    const rows = `
+        SELECT 
+            livros.*, 
+            autor.nome AS autor_nome, 
+            autor.nacionalidade
+        FROM livros
+        JOIN autor ON livros.autorId = autor.id
+        WHERE autor.nome LIKE ?
+    `;
+
+    const [resultado] = await db.query(rows, [`%${autor}%`]);
+    return resultado;
+  
+}
+
 async function getLivroPorId(id){
     const [rows] = await db.query("SELECT * FROM livros WHERE id = ?", [id]); 
     return rows[0];
 }
 
 async function insereLivro(livroNovo){
-    const {nome, autor, ano} = livroNovo
-    const [result] = await db.query("INSERT INTO livros (nome, autor, ano) VALUES (?,?,?)", [nome, autor, ano]) 
-    return {id: result.insertId, ...livroNovo}
+    let {nome, ano, autorId} = livroNovo
+    let autorCompleto = null
+
+    if(autorId){
+        const autorEncontrado = await getAutorPorId(autorId)
+        if(autorEncontrado){
+            autorCompleto = autorEncontrado
+        }else{
+            autorId = null
+        }
+    }
+    const [result] = await db.query("INSERT INTO livros(nome, ano, autorId) VALUES (?,?,?)", [nome, ano, autorId])
+    return {id:result.insertId, nome, ano, autorId}
 }
+
+
 
 async function modificaLivro(modificacoes, id){
     const campos = []
@@ -39,6 +68,7 @@ async function deleteLivro(id) {
 
 module.exports = {
     getTodosLivros,
+    listarLivrosPorAutor,
     getLivroPorId,
     insereLivro,
     modificaLivro,
